@@ -65,10 +65,10 @@ class App extends Component {
       <ApolloProvider client={client}>
         <AppError />
         <div className="ui grid">
-          <div className="four wide column">
+          <div className="eight wide column">
             <One />
           </div>
-          <div className="four wide column">
+          <div className="eight wide column">
             <Two />
           </div>
         </div>
@@ -106,6 +106,12 @@ const ONE_QUERY = gql`
 `;
 
 const One = () => {
+  const Heading = () => (
+    <h3>
+      This will fail if you Refetch with browser offline <br />
+      (and show global error message)
+    </h3>
+  );
   return (
     <Query query={ONE_QUERY}>
       {({ loading, error, data, refetch }) => {
@@ -114,19 +120,23 @@ const One = () => {
           // ApolloError
           // debugger;
           return (
-            <div className="ui message error">
-              Error in one component: {error.message}
-            </div>
+            <>
+              <Heading />
+              <div className="ui message error">
+                Error in one component: {error.message}
+              </div>
+            </>
           );
         }
         return (
           <>
+            <Heading />
             <ul>
               {data.allProducts.slice(0, 5).map((item: any, key: any) => (
                 <li {...{ key }}>{item.name}</li>
               ))}
             </ul>
-            <button onClick={() => refetch()}>Refresh</button>
+            <button onClick={() => refetch()}>Refetch</button>
           </>
         );
       }}
@@ -149,17 +159,26 @@ const Two = () => {
         if (loading) return <div className="ui message">Loading</div>;
         if (error) {
           return (
-            <div className="ui message error">
-              Error in two component: {"error"}
-            </div>
+            <>
+              <h3>
+                This will fail always due to a gql error <br />
+                (malformed query)
+              </h3>
+
+              <div className="ui message error">
+                Error in two component: {error.message}
+              </div>
+            </>
           );
         }
         return (
-          <ul>
-            {data.allTodos.slice(0, 5).map((item: any, key: any) => (
-              <li {...{ key }}>{item.title}</li>
-            ))}
-          </ul>
+          <>
+            <ul>
+              {data.allTodos.slice(0, 5).map((item: any, key: any) => (
+                <li {...{ key }}>{item.title}</li>
+              ))}
+            </ul>
+          </>
         );
       }}
     </Query>
